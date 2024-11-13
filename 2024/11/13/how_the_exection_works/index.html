@@ -19,17 +19,19 @@
   <meta name="author" content="一岁半">
   <meta name="keywords" content="">
   
-    <meta name="description" content="1.对象的实例化1.1 创建对象的方式 使用 new 关键字 使用 clone() 方法，不调用构造器，但是类必须实现 Cloneable() 接口，实现 clone() ，默认是浅拷贝 使用 Class 的 newInstance() 方法：反射的方式，只能是空参的构造器，并且权限是 public 使用 Constructor 的 newInstance() 方法：反射的方式，可以调用空参、带参">
+    <meta name="description" content="执行引擎篇1.1 执行引擎是做什么的？ 首先要明确一下执行引擎是 JVM 的重要组成部分之一 “虚拟机”是一个相对于”物理机”的概念，这两种机器都有代码执行的能力，其区别是物理机的执行引擎是&lt;font color&#x3D;&quot;red&quot;&gt;直接建立在处理器、缓存、指令集和操作系统&lt;&#x2F;font&gt;层面上的，而虚拟机的执行引擎则是由&lt;font color&#x3D;&quot;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一岁半大魔王">
-<meta property="og:url" content="http://example.com/2024/11/12/JVM_object_memory_allocate/index.html">
+<meta property="og:url" content="http://example.com/2024/11/13/how_the_exection_works/index.html">
 <meta property="og:site_name" content="一岁半大魔王">
-<meta property="og:description" content="1.对象的实例化1.1 创建对象的方式 使用 new 关键字 使用 clone() 方法，不调用构造器，但是类必须实现 Cloneable() 接口，实现 clone() ，默认是浅拷贝 使用 Class 的 newInstance() 方法：反射的方式，只能是空参的构造器，并且权限是 public 使用 Constructor 的 newInstance() 方法：反射的方式，可以调用空参、带参">
+<meta property="og:description" content="执行引擎篇1.1 执行引擎是做什么的？ 首先要明确一下执行引擎是 JVM 的重要组成部分之一 “虚拟机”是一个相对于”物理机”的概念，这两种机器都有代码执行的能力，其区别是物理机的执行引擎是&lt;font color&#x3D;&quot;red&quot;&gt;直接建立在处理器、缓存、指令集和操作系统&lt;&#x2F;font&gt;层面上的，而虚拟机的执行引擎则是由&lt;font color&#x3D;&quot;">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-11-12T07:23:28.152Z">
-<meta property="article:modified_time" content="2024-11-12T07:25:17.395Z">
+<meta property="og:image" content="https://i-blog.csdnimg.cn/direct/1c5009549a994f8bbcd71f96be20510f.png">
+<meta property="article:published_time" content="2024-11-13T13:33:15.075Z">
+<meta property="article:modified_time" content="2024-11-13T13:33:27.077Z">
 <meta property="article:author" content="一岁半">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i-blog.csdnimg.cn/direct/1c5009549a994f8bbcd71f96be20510f.png">
   
   
   
@@ -210,8 +212,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-11-12 15:23" pubdate>
-          2024年11月12日 下午
+        <time datetime="2024-11-13 21:33" pubdate>
+          2024年11月13日 晚上
         </time>
       </span>
     
@@ -222,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.9k 字
+          1.8k 字
         
       </span>
     
@@ -233,7 +235,7 @@
         
         
         
-          17 分钟
+          15 分钟
         
       </span>
     
@@ -275,81 +277,45 @@
             
               <div class="markdown-body">
                 
-                <h1 id="1-对象的实例化"><a href="#1-对象的实例化" class="headerlink" title="1.对象的实例化"></a>1.对象的实例化</h1><h2 id="1-1-创建对象的方式"><a href="#1-1-创建对象的方式" class="headerlink" title="1.1 创建对象的方式"></a>1.1 创建对象的方式</h2><ol>
-<li>使用 new 关键字</li>
-<li>使用 clone() 方法，不调用构造器，但是类必须实现 Cloneable() 接口，实现 clone() ，默认是浅拷贝</li>
-<li>使用 Class 的 newInstance() 方法：反射的方式，只能是空参的构造器，并且权限是 public</li>
-<li>使用 Constructor 的 newInstance() 方法：反射的方式，可以调用空参、带参的构造函数，权限没有要求，使用更加广泛</li>
-<li>反序列化：从文件、网络、数据库中获得一个二进制数据流，反序列化为对线</li>
-<li>使用第三方库</li>
-</ol>
-<h2 id="1-2-对象创建的步骤"><a href="#1-2-对象创建的步骤" class="headerlink" title="1.2 对象创建的步骤"></a>1.2 对象创建的步骤</h2><h3 id="从字节码角度看对象创建的过程"><a href="#从字节码角度看对象创建的过程" class="headerlink" title="从字节码角度看对象创建的过程"></a>从字节码角度看对象创建的过程</h3><blockquote>
-<p>C10K的问题我这 1 bit 的脑子不够用了，此处先省略2000字</p>
-</blockquote>
-<h3 id="从执行步骤角度分析"><a href="#从执行步骤角度分析" class="headerlink" title="从执行步骤角度分析"></a>从执行步骤角度分析</h3><ol>
-<li>判断对象对应的类是否加载、链接、初始化。如果没有，在双亲委派机制下使用当前类加载器以 ClassLoader + 包名 + 类名为 key 进行查找对应的 .class 文件，如果没找到该文件，则抛出 ClassNotFoundExecption 异常，如果找到，则进行类加载，并生成对应的 Class 类的对象</li>
-<li><code>&lt;font color=&quot;red&quot;&gt;</code>为对象分配内存：<code>&lt;/font&gt;</code><br>两种方式：<ul>
-<li>指针碰撞：在内存规整的情况下，由一个指针指向内存中已使用和未使用的中间位置(说人话就是已使用的内存和未使用的内存分别在两边，中间有一条河作为分界线，这个河就是分界指针)，每次在需要分配内存的时候，将指针向未使用空间移动要分配的大小。如果虚拟机使用的是 Serial、ParNew 这种基于压缩算法的，虚拟机栈采用这种分配方式分配内存。</li>
-<li>空闲列表：如果内存不是规整的，则使用空闲列表法进行对象空间分配。这个方法的意思是虚拟机维护了一个列表，记录着哪些内存是可用的，在分配的时候直接查找列表从列表中查找一块足够大的空间分配给对象实例，并更行列表内容。这种分配方式称为“空闲列表（Free List）”。</li>
+                <h1 id="执行引擎篇"><a href="#执行引擎篇" class="headerlink" title="执行引擎篇"></a>执行引擎篇</h1><h2 id="1-1-执行引擎是做什么的？"><a href="#1-1-执行引擎是做什么的？" class="headerlink" title="1.1 执行引擎是做什么的？"></a>1.1 执行引擎是做什么的？</h2><ul>
+<li>首先要明确一下执行引擎是 JVM 的重要组成部分之一</li>
+<li>“虚拟机”是一个相对于”物理机”的概念，这两种机器都有代码执行的能力，其区别是物理机的执行引擎是<code>&lt;font color=&quot;red&quot;&gt;</code>直接建立在处理器、缓存、指令集和操作系统<code>&lt;/font&gt;</code>层面上的，而虚拟机的执行引擎则是由<code>&lt;font color=&quot;red&quot;&gt;</code>软件<code>&lt;/font&gt;</code>执行的，因此可以不收物理条件制约的定制指令集于执行引擎的结构体系，能够执行那些不被硬件直接支持的指令集格式</li>
+<li>JVM 的主要任务是负责装载<code>&lt;font color=&quot;red&quot;&gt;</code>字节码执行引擎内部<code>&lt;/font&gt;</code>，但字节码并不能直接运行在操作系统上，因为字节码指令并非等价于本地机器指令，它内部包含的是一些仅能被 JVM 识别的字节码指令、符号表，以及其他辅助信息</li>
+<li>那么，如果想要让一个Java程序运行起来，执行引擎(Execution Engine)的任务就是将字节码指令解释&#x2F;编译为对应平台上的本地机器指令才可以。简单来说，JVM中的执行引擎充当了将高级语言翻译为机器语言的译者</li>
+</ul>
+<h2 id="1-2-执行引擎是怎么工作的呢？？？"><a href="#1-2-执行引擎是怎么工作的呢？？？" class="headerlink" title="1.2 执行引擎是怎么工作的呢？？？"></a>1.2 执行引擎是怎么工作的呢？？？</h2><p><strong>从外观上看，所有的 Java 虚拟机的执行引擎的输入、输出结果都是一致的：输入的是字节码二进制流，处理过程是字节码解析执行的的等效过程，输出的是执行结果</strong><br><img src="https://i-blog.csdnimg.cn/direct/1c5009549a994f8bbcd71f96be20510f.png" srcset="/img/loading.gif" lazyload alt="请添加图片描述"></p>
+<ul>
+<li>执行引擎在执行的过程中就行需要执行怎么样的字节码指令完全依赖于 PC 寄存器</li>
+<li>每当执行完一项指令操作之后，PC 寄存器就会更新下一条需要被执行的指令地址</li>
+<li>当然方法在执行的过程中，执行引擎有可能会通过存储在局部变量表中的对象引用准确的在 Java 堆信息中的对象实例信息，以及通过对象头中的元数据指针定位到目标对象的类型信息</li>
+</ul>
+<h2 id="1-3-代码编译和执行的过程"><a href="#1-3-代码编译和执行的过程" class="headerlink" title="1.3 代码编译和执行的过程"></a>1.3 代码编译和执行的过程</h2><h3 id="1-3-1-什么是编译？"><a href="#1-3-1-什么是编译？" class="headerlink" title="1.3.1 什么是编译？"></a>1.3.1 什么是编译？</h3><p>Java 的编译期其实是一段不确定的操作过程，它可能是编译器前端把一个 .java 文件转化为 .class 文件的过程，也可能是后端运行期编译器（JIT Just In Time Compiler）把字节码转化为机器码的过程，还可能是指使用静态提前编译器（AOT Ahead Of Time Compiler）直接把 .java 文件编译为本地机器码的过程</p>
+<h3 id="1-3-2-解释器工作机制（或工作任务）"><a href="#1-3-2-解释器工作机制（或工作任务）" class="headerlink" title="1.3.2 解释器工作机制（或工作任务）"></a>1.3.2 解释器工作机制（或工作任务）</h3><p>解释器真正的角色就是一个运行时的“翻译者”，将字节码文件中的内容”翻译”为对应平台的本地机器指令去执行，从这个角度来说，Java 是解释性的语言。当一条字节码指令被解释执行完成后，接着再根据PC寄存器中记录的下一条需要被执行的字节码指令执行解释操作。</p>
+<h3 id="1-3-3-解释器的分类"><a href="#1-3-3-解释器的分类" class="headerlink" title="1.3.3 解释器的分类"></a>1.3.3 解释器的分类</h3><p>在Java的发展历史里，一共有两套解释执行器，即古老的字节码解释器、现在普遍使用的模板解释器。</p>
+<ul>
+<li>字节码解释器在执行时通过纯软件代码模拟字节码的执行，效率非常低下。</li>
+<li>而模板解释器将每一条字节码和一个模板函数相关联，模板函数中直接产生这条字节码执行时的机器码，从而很大程度上提高了解释器的性能。在HotSpot VM中，解释器主要由Interpreter模块和Code模块构成。<ul>
+<li>Interpreter模块：实现了解释器的核心功能</li>
+<li>Code模块：用于管理HotSpot VM在运行时生成的本地机器指令</li>
 </ul>
 </li>
-<li>处理并发安全问题：在创建对象的时候有可能会出现并发创建的问题，这个时候虚拟机需要保证线程安全性，虚拟机采用了两种方式实现：<ul>
-<li>CAS（Compare And Swap）：失败重试、区域加锁：保证指针更新操作的原子性</li>
-<li>TLAB 把内存分配的动作按照线程划分在不同的空间职中进行，即每个线程在 Java 堆中预先分配一小块内存，称为本地线程分配缓冲区，（TLAB ，Thread Local Allocation Buffer）虚拟机是否使用TLAB，可以通过-XX:+&#x2F;-UseTLAB参数来设定。</li>
 </ul>
-</li>
-<li>初始化分配到的空间：内存分配结束，虚拟机将分配到的内存空间都初始化为零（不包含对象头）。这一步保证了对象的实例字段在 Java 代码中可以不用赋值就可以直接使用，程序能访问到这些数据类型兑现的字段的零值。</li>
-<li>设置对象的对象头：将对象的所属类（即类的元数据信息）、对象的HashCode和对象的GC信息、锁信息等数据存储在对象的对象头中。这个过程的具体设置方式取决于JVM实现</li>
-<li>执行 init 方法进行初始化：在Java程序的视角看来，初始化才正式开始。初始化成员变量，执行实例化代码块，调用类的构造方法，并把堆内对象的首地址赋值给引用变量。<br>因此一般来说（由字节码中是否跟随有invokespecial指令所决定），new指令之后会接着就是执行方法，把对象按照程序员的意愿进行初始化，这样一个真正可用的对象才算完全创建出来</li>
-</ol>
+<p><strong>只用解释器带来的问题？</strong></p>
+<ul>
+<li>基于解释器执行已经沦落为低效的代名词</li>
+<li>为了解决这个问题，JVM平台支持一种叫作即时编译的技术。即时编译的目的是避免函数被解释执行，而是将整个函数体编译成为机器码，每次函数执行时，只执行编译后的机器码即可，这种方式可以使执行效率大幅度提升。</li>
+<li>不过无论如何，基于解释器的执行模式仍然为中间语言的发展做出了不可磨灭的贡献。</li>
+</ul>
+<h3 id="1-3-4-Java-代码的执行分类"><a href="#1-3-4-Java-代码的执行分类" class="headerlink" title="1.3.4 Java 代码的执行分类"></a>1.3.4 Java 代码的执行分类</h3><ul>
+<li>第一种是将源代码编译成字节码文件，然后在运行时通过解释器将字节码文件转为机器码执行</li>
+<li>第二种是编译执行（直接编译成机器码）。现代虚拟机为了提高执行效率，会使用即时编译技术（JIT,Just In Time）将方法编译成机器码后再执行</li>
+<li>HotSpot VM是目前市面上高性能虚拟机的代表作之一。它采用解释器与即时编译器并存的架构。在Java虚拟机运行时，解释器和即时编译器能够相互协作，各自取长补短，尽力去选择最合适的方式来权衡编译本地代码的时间和直接解释执行代码的时间。</li>
+</ul>
+<h3 id="那么问题来了，既然解释型语言效率不高，那么为什么还保留着解释器呢？"><a href="#那么问题来了，既然解释型语言效率不高，那么为什么还保留着解释器呢？" class="headerlink" title="那么问题来了，既然解释型语言效率不高，那么为什么还保留着解释器呢？"></a>那么问题来了，既然解释型语言效率不高，那么为什么还保留着解释器呢？</h3><p>首先明确：<br>当程序启动后，解释器可以马上发挥作用，省去编译的时间，立即执行。<br>编译器要想发挥作用，把代码编译成本地代码，需要一定的执行时间。但编译为本地代码后，执行效率高。<br>所以：<br>尽管JRockit VM中程序的执行性能会非常高效，但程序在启动时必然需要花费更长的时间来进行编译。对于服务端应用来说，启动时间并非是关注重点，但对于那些看中启动时间的应用场景而言，或许就需要采用解释器与即时编译器并存的架构来换取一个平衡点。在此模式下，当Java虚拟器启动时，解释器可以首先发挥作用，而不必等待即时编译器全部编译完成后再执行，这样可以省去许多不必要的编译时间。随着时间的推移，编译器发挥作用，把越来越多的代码编译成本地代码，获得更高的执行效率。</p>
+<p>同时，解释执行在编译器进行激进优化不成立的时候，作为编译器的“逃生门”</p>
 <blockquote>
-<p>至此对象的实例化才算完成</p>
+<p>好啦，今天的文章就水到这里啦，还有详细的关于 Client Compiler 编译器和 Server Compiler编译器的内容就下次再讲啦！！！！！</p>
 </blockquote>
-<h2 id="2-对象的内存布局"><a href="#2-对象的内存布局" class="headerlink" title="2. 对象的内存布局"></a>2. 对象的内存布局</h2><p>一个对象主要是有对象头和实力数据组成，还包括一个可能存在的对齐填充。接下来就让我们一起了解一下他们   ———-&gt;</p>
-<h3 id="2-1-对象头："><a href="#2-1-对象头：" class="headerlink" title="2.1 对象头："></a>2.1 对象头：</h3><p>主要包括两部分：</p>
-<ul>
-<li><p>一个是对象自身的 <code>&lt;font color=&quot;red&quot;&gt;</code>运行时元数据（Mark Word）<code>&lt;/font&gt;</code>：</p>
-<ul>
-<li>哈希值（hashcode）：对象在堆空间中都有一个首地址值，栈空间的引用根据这个地址指向堆中的对象，这就是哈希值起的作用</li>
-<li>GC 分代年龄：对象首先是在 Eden 中创建的，在经过多次 GC 后，如果没有被进行回收，就会在 survivor 中来回移动，其对应的年龄计数器就会发生变化，达到阈值后就会进入老年代</li>
-<li>锁状态标志，在同步中判断该对象是否被占用</li>
-<li>线程持有的锁</li>
-<li>线程偏向 ID</li>
-<li>偏向时间戳</li>
-</ul>
-</li>
-<li><p>另一个就是类型指针，指向元数据区的类元数据 InstanceClass，确定该对象所属的类型</p>
-</li>
-<li><p>此外如果对象是一个数组，对象头中还必须有一块用于记录数组的长度的数据。因为正常对象元数据就知道对象的确切大小，所以数组必须得知道长度</p>
-</li>
-</ul>
-<h3 id="2-2-实例数据"><a href="#2-2-实例数据" class="headerlink" title="2.2 实例数据"></a>2.2 实例数据</h3><p>作用：它是真正保存对象有效信息的，包括代码中定义的各种类型的字段（包括从父类继承下来的和本身拥有的字段）<br><code>&lt;br&gt;</code><br>这里需要遵守一些规则：</p>
-<ul>
-<li>相同宽度的字段总是被分配在一起</li>
-<li>父类中定义的变量会出现在子类之前（因为父类的加载是优先于子类加载的）</li>
-<li>如果CompactFields参数为true(默认为true)：子类的窄变量可能插入到父类变量的空隙</li>
-</ul>
-<h3 id="2-3-对齐填充"><a href="#2-3-对齐填充" class="headerlink" title="2.3 对齐填充"></a>2.3 对齐填充</h3><p>不是必须的，也没有特别含义，仅仅起到占位的作用</p>
-<h2 id="3-对象的访问定位"><a href="#3-对象的访问定位" class="headerlink" title="3. 对象的访问定位"></a>3. 对象的访问定位</h2><p>创建对象的目的就是为了使用它。定位，通过 栈上 refence 访问</p>
-<p>主流的对象访问方式有两种：</p>
-<ul>
-<li>使用句柄访问</li>
-<li>使用直接指针访问</li>
-</ul>
-<blockquote>
-<p>请读者注意，此处本人了解甚微，深入的内容请大家自行查阅补充</p>
-</blockquote>
-<h3 id="3-1-使用句柄访问："><a href="#3-1-使用句柄访问：" class="headerlink" title="3.1 使用句柄访问："></a>3.1 使用句柄访问：</h3><ul>
-<li>实现：堆需要划分出一块内存来做句柄池，reference中存储对象的句柄池地址，句柄中包含对象实例与类型数据各自具体的地址信息。</li>
-<li>好处：reference中存储稳定句柄地址，对象被移动（垃圾收集时移动对象很普遍）时只会改变句柄中实例数据指针，reference本身不需要被修改。</li>
-</ul>
-<h3 id="3-2-使用直接指针访问"><a href="#3-2-使用直接指针访问" class="headerlink" title="3.2 使用直接指针访问"></a>3.2 使用直接指针访问</h3><ul>
-<li>实现：reference中存储的就是对象的地址，如果只是访问对象本身的话，就不需要多一次间接访问的开销。</li>
-<li>好处：速度更快，java中对象访问频繁，每次访问都节省了一次指针定位的时间开销</li>
-</ul>
-<p><strong>而 HotSpot这里主要使用第2种方式：直接指针访问</strong></p>
-<p>JVM可以通过对象引用准确定位到Java堆区中的instanceOopDesc对象，这样既可成功访问到对象的实例信息，当需要访问目标对象的具体类型时，JVM则会通过存储在instanceOopDesc中的元数据指针定位到存储在方法区中的instanceKlass对象上</p>
-<p>至此内存布局篇结束，希望广大读者发现问题及时纠正一下！！！</p>
 
                 
               </div>
@@ -368,7 +334,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div></div>
-      <div>http://example.com/2024/11/12/JVM_object_memory_allocate/</div>
+      <div>http://example.com/2024/11/13/how_the_exection_works/</div>
     </div>
     <div class="license-meta">
       
@@ -380,7 +346,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年11月12日</div>
+          <div>2024年11月13日</div>
         </div>
       
       
@@ -412,18 +378,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/11/13/how_the_exection_works/" title="">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile"></span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/10/27/about/" title="about">
-                        <span class="hidden-mobile">about</span>
+                      <a href="/2024/11/12/JVM_object_memory_allocate/" title="">
+                        <span class="hidden-mobile"></span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
