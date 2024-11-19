@@ -19,19 +19,17 @@
   <meta name="author" content="一岁半">
   <meta name="keywords" content="">
   
-    <meta name="description" content="执行引擎篇1.1 执行引擎是做什么的？ 首先要明确一下执行引擎是 JVM 的重要组成部分之一 “虚拟机”是一个相对于”物理机”的概念，这两种机器都有代码执行的能力，其区别是物理机的执行引擎是&lt;font color&#x3D;&quot;red&quot;&gt;直接建立在处理器、缓存、指令集和操作系统&lt;&#x2F;font&gt;层面上的，而虚拟机的执行引擎则是由&lt;font color&#x3D;&quot;">
+    <meta name="description" content="JVM 之垃圾回收算法一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾垃圾的概念就是指程序运行过程中&lt;font color&#x3D;&quot;red&quot;&gt;没有任何指针指向的对象&lt;&#x2F;font&gt;，那么这样的对象就是需要被回收的垃圾 如果不能及时的对这些内存中的垃圾进行回收，那么这些垃圾就会一直占用空间到程序结束，被保留的空间无法被其他对象使用，从而可能导致内存溢出 二、">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一岁半大魔王">
-<meta property="og:url" content="http://example.com/2024/11/13/how_the_exection_works/index.html">
+<meta property="og:url" content="http://example.com/2024/11/19/JVM_GC_mark_gr/index.html">
 <meta property="og:site_name" content="一岁半大魔王">
-<meta property="og:description" content="执行引擎篇1.1 执行引擎是做什么的？ 首先要明确一下执行引擎是 JVM 的重要组成部分之一 “虚拟机”是一个相对于”物理机”的概念，这两种机器都有代码执行的能力，其区别是物理机的执行引擎是&lt;font color&#x3D;&quot;red&quot;&gt;直接建立在处理器、缓存、指令集和操作系统&lt;&#x2F;font&gt;层面上的，而虚拟机的执行引擎则是由&lt;font color&#x3D;&quot;">
+<meta property="og:description" content="JVM 之垃圾回收算法一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾垃圾的概念就是指程序运行过程中&lt;font color&#x3D;&quot;red&quot;&gt;没有任何指针指向的对象&lt;&#x2F;font&gt;，那么这样的对象就是需要被回收的垃圾 如果不能及时的对这些内存中的垃圾进行回收，那么这些垃圾就会一直占用空间到程序结束，被保留的空间无法被其他对象使用，从而可能导致内存溢出 二、">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://i-blog.csdnimg.cn/direct/1c5009549a994f8bbcd71f96be20510f.png">
-<meta property="article:published_time" content="2024-11-13T13:33:15.075Z">
-<meta property="article:modified_time" content="2024-11-13T13:36:31.124Z">
+<meta property="article:published_time" content="2024-11-19T15:00:09.199Z">
+<meta property="article:modified_time" content="2024-11-19T15:03:52.414Z">
 <meta property="article:author" content="一岁半">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://i-blog.csdnimg.cn/direct/1c5009549a994f8bbcd71f96be20510f.png">
   
   
   
@@ -212,8 +210,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-11-13 21:33" pubdate>
-          2024年11月13日 晚上
+        <time datetime="2024-11-19 23:00" pubdate>
+          2024年11月19日 晚上
         </time>
       </span>
     
@@ -224,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.8k 字
+          1.5k 字
         
       </span>
     
@@ -235,7 +233,7 @@
         
         
         
-          15 分钟
+          13 分钟
         
       </span>
     
@@ -277,44 +275,66 @@
             
               <div class="markdown-body">
                 
-                <h1 id="执行引擎篇"><a href="#执行引擎篇" class="headerlink" title="执行引擎篇"></a>执行引擎篇</h1><h2 id="1-1-执行引擎是做什么的？"><a href="#1-1-执行引擎是做什么的？" class="headerlink" title="1.1 执行引擎是做什么的？"></a>1.1 执行引擎是做什么的？</h2><ul>
-<li>首先要明确一下执行引擎是 JVM 的重要组成部分之一</li>
-<li>“虚拟机”是一个相对于”物理机”的概念，这两种机器都有代码执行的能力，其区别是物理机的执行引擎是<code>&lt;font color=&quot;red&quot;&gt;</code>直接建立在处理器、缓存、指令集和操作系统<code>&lt;/font&gt;</code>层面上的，而虚拟机的执行引擎则是由<code>&lt;font color=&quot;red&quot;&gt;</code>软件<code>&lt;/font&gt;</code>执行的，因此可以不收物理条件制约的定制指令集于执行引擎的结构体系，能够执行那些不被硬件直接支持的指令集格式</li>
-<li>JVM 的主要任务是负责装载<code>&lt;font color=&quot;red&quot;&gt;</code>字节码执行引擎内部<code>&lt;/font&gt;</code>，但字节码并不能直接运行在操作系统上，因为字节码指令并非等价于本地机器指令，它内部包含的是一些仅能被 JVM 识别的字节码指令、符号表，以及其他辅助信息</li>
-<li>那么，如果想要让一个Java程序运行起来，执行引擎(Execution Engine)的任务就是将字节码指令解释&#x2F;编译为对应平台上的本地机器指令才可以。简单来说，JVM中的执行引擎充当了将高级语言翻译为机器语言的译者</li>
+                <h2 id="JVM-之垃圾回收算法"><a href="#JVM-之垃圾回收算法" class="headerlink" title="JVM 之垃圾回收算法"></a>JVM 之垃圾回收算法</h2><h3 id="一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾"><a href="#一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾" class="headerlink" title="一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾"></a>一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾</h3><p>垃圾的概念就是指程序运行过程中<code>&lt;font color=&quot;red&quot;&gt;</code>没有任何指针指向的对象<code>&lt;/font&gt;</code>，那么这样的对象就是需要被回收的垃圾</p>
+<p>如果不能及时的对这些内存中的垃圾进行回收，那么这些垃圾就会一直占用空间到程序结束，被保留的空间无法被其他对象使用，从而可能导致内存溢出</p>
+<h3 id="二、为什么需要GC？？？？"><a href="#二、为什么需要GC？？？？" class="headerlink" title="二、为什么需要GC？？？？"></a>二、为什么需要GC？？？？</h3><ul>
+<li>一个基本的认知就是高级程序设计语言如果不进行垃圾回收那么最后一定会造成内存溢出。那么为了避免这样的现象就一定需要有垃圾回收机制进行垃圾清理。</li>
+<li>而且，除了释放没用的对象外还可以整理 JVM 中碎片的内存区域，将不规整的小碎片区域进行整理，为后来可能出现的大对象预留空间</li>
+<li>随着业务越来越庞大，代码越来越复杂，用户越来越多，传统的 STW 的垃圾回收方式已经跟不上需求，必须对传统的垃圾回收方式进行改进</li>
 </ul>
-<h2 id="1-2-执行引擎是怎么工作的呢？？？"><a href="#1-2-执行引擎是怎么工作的呢？？？" class="headerlink" title="1.2 执行引擎是怎么工作的呢？？？"></a>1.2 执行引擎是怎么工作的呢？？？</h2><p><strong>从外观上看，所有的 Java 虚拟机的执行引擎的输入、输出结果都是一致的：输入的是字节码二进制流，处理过程是字节码解析执行的的等效过程，输出的是执行结果</strong><br><img src="https://i-blog.csdnimg.cn/direct/1c5009549a994f8bbcd71f96be20510f.png" srcset="/img/loading.gif" lazyload alt="请添加图片描述"></p>
+<h3 id="三、主要对那些内存区域进行-GC"><a href="#三、主要对那些内存区域进行-GC" class="headerlink" title="三、主要对那些内存区域进行 GC"></a>三、主要对那些内存区域进行 GC</h3><p>垃圾回收器可以对 JVM 管理的所有内存区域进行垃圾回收，其中 <code>&lt;font color=&quot;red&quot;&gt;</code>堆区域<code>&lt;/font&gt;</code>是垃圾回收的重点<br>从次数上讲 应该是<code>&lt;font color=&quot;red&quot;&gt;</code>频繁的收集 young 区，较少回收 old 区，基本不动 Perm 区<code>&lt;/font&gt;</code></p>
+<h3 id="四、这就到了这次的重头戏-——垃圾回收算法"><a href="#四、这就到了这次的重头戏-——垃圾回收算法" class="headerlink" title="四、&lt;font color=&quot;red&quot;&gt;这就到了这次的重头戏-——垃圾回收算法&lt;/font&gt;"></a>四、<code>&lt;font color=&quot;red&quot;&gt;</code>这就到了这次的重头戏-——垃圾回收算法<code>&lt;/font&gt;</code></h3><h4 id="4-1-判别阶段的算法"><a href="#4-1-判别阶段的算法" class="headerlink" title="4.1 判别阶段的算法"></a>4.1 判别阶段的算法</h4><h5 id="4-1-1-引用计数法"><a href="#4-1-1-引用计数法" class="headerlink" title="4.1.1 引用计数法"></a>4.1.1 引用计数法</h5><p><strong>什么是引用计数？</strong> 对于一个对象 A ，如果有其他的任何一个对象引用了 A ，则 A 的引用计数器加 1 ，当应用失效时，则该对象的引用计数器减 1 ，只要该对象的引用计数器为 0 则证明没有其他对象引用该对象，即当前对象引用失效，可以进行回收</p>
+<p><strong>优点？</strong>  实现简单，垃圾对象便于标识，判定效率高，回收没有延迟性<br><strong>缺点？</strong></p>
 <ul>
-<li>执行引擎在执行的过程中就行需要执行怎么样的字节码指令完全依赖于 PC 寄存器</li>
-<li>每当执行完一项指令操作之后，PC 寄存器就会更新下一条需要被执行的指令地址</li>
-<li>当然方法在执行的过程中，执行引擎有可能会通过存储在局部变量表中的对象引用准确的在 Java 堆信息中的对象实例信息，以及通过对象头中的元数据指针定位到目标对象的类型信息</li>
+<li><code>&lt;font color=&quot;red&quot;&gt;</code>存在循环引用问题<code>&lt;/font&gt;</code>，可能会出现两个孤岛彼此相连无法回收的问题（主要问题）</li>
+<li>它需要单独存储计数器，增加了空间开销</li>
+<li>每次赋值都需要进行计数器的更新，增加了时间开销</li>
 </ul>
-<h2 id="1-3-代码编译和执行的过程"><a href="#1-3-代码编译和执行的过程" class="headerlink" title="1.3 代码编译和执行的过程"></a>1.3 代码编译和执行的过程</h2><h3 id="1-3-1-什么是编译？"><a href="#1-3-1-什么是编译？" class="headerlink" title="1.3.1 什么是编译？"></a>1.3.1 什么是编译？</h3><p>Java 的编译期其实是一段不确定的操作过程，它可能是编译器前端把一个 .java 文件转化为 .class 文件的过程，也可能是后端运行期编译器（JIT Just In Time Compiler）把字节码转化为机器码的过程，还可能是指使用静态提前编译器（AOT Ahead Of Time Compiler）直接把 .java 文件编译为本地机器码的过程</p>
-<h3 id="1-3-2-解释器工作机制（或工作任务）"><a href="#1-3-2-解释器工作机制（或工作任务）" class="headerlink" title="1.3.2 解释器工作机制（或工作任务）"></a>1.3.2 解释器工作机制（或工作任务）</h3><p>解释器真正的角色就是一个运行时的“翻译者”，将字节码文件中的内容”翻译”为对应平台的本地机器指令去执行，从这个角度来说，Java 是解释性的语言。当一条字节码指令被解释执行完成后，接着再根据PC寄存器中记录的下一条需要被执行的字节码指令执行解释操作。</p>
-<h3 id="1-3-3-解释器的分类"><a href="#1-3-3-解释器的分类" class="headerlink" title="1.3.3 解释器的分类"></a>1.3.3 解释器的分类</h3><p>在Java的发展历史里，一共有两套解释执行器，即古老的字节码解释器、现在普遍使用的模板解释器。</p>
+<p><strong>就想用这个算法怎么办？？？？</strong><br>那么就要解决主要矛盾——循环引用问题的解决：Python就使用了引用计数的方法进行垃圾回收，那么 Python 是怎么解决的呢？</p>
 <ul>
-<li>字节码解释器在执行时通过纯软件代码模拟字节码的执行，效率非常低下。</li>
-<li>而模板解释器将每一条字节码和一个模板函数相关联，模板函数中直接产生这条字节码执行时的机器码，从而很大程度上提高了解释器的性能。在HotSpot VM中，解释器主要由Interpreter模块和Code模块构成。<ul>
-<li>Interpreter模块：实现了解释器的核心功能</li>
-<li>Code模块：用于管理HotSpot VM在运行时生成的本地机器指令</li>
+<li>首先就是使用手动解除，这很好理解，就是在合适的时候，解除引用关系</li>
+<li>其次就是使用弱引用（weakref）</li>
+</ul>
+<blockquote>
+<p>关于 Python 这作者只知道这些，余下的需要读者去进行补充</p>
+</blockquote>
+<h5 id="4-1-2-可达性分析算法"><a href="#4-1-2-可达性分析算法" class="headerlink" title="4.1.2 可达性分析算法"></a>4.1.2 可达性分析算法</h5><p>原理与基本实现思路：简单来说就是将对象之间的引用关系看成图，选定活动的对象作为 GC Roots ，然后跟踪引用链条，如果一个对象和 GC Roots 之间不可达，也就是不存在引用链条，那么即可认为是可回收对象。</p>
+<p><strong>基本思路：</strong></p>
+<ul>
+<li>可达性分析算法是以根对象集合(GC Roots)为起始点，按照从上至下的方式搜索被根对象集合所连接的目标对象是否可达。</li>
+<li>使用可达性分析算法后，内存中的存活对象都会被根对象集合直接或间接连接着，搜索所走过的路径称为引用链(Reference Chain)</li>
+<li>如果目标对象没有任何引用链相连，则是不可达的，就意味着该对象己经死亡，可以标记为垃圾对象。</li>
+<li>在可达性分析算法中，只有能够被根对象集合直接或者间接连接的对象才是存活对象。</li>
+</ul>
+<blockquote>
+<p>目前，这种垃圾标记算法比较常用</p>
+</blockquote>
+<p><strong>优点：实现简单，执行高效，有效解决循环引用的问题，可以防止内存泄漏</strong></p>
+<p><strong>什么样的对象可以被认为是 Gc Roots ？</strong></p>
+<ul>
+<li>虚拟机栈中引用的对象<ul>
+<li>比如：各个线程被调用的方法中使用到的参数、局部变量等。</li>
 </ul>
 </li>
+<li>本地方法栈内JNI(通常说的本地方法)引用的对象</li>
+<li>类静态属性引用的对象<ul>
+<li>比如：Java类的引用类型静态变量</li>
 </ul>
-<p><strong>只用解释器带来的问题？</strong></p>
-<ul>
-<li>基于解释器执行已经沦落为低效的代名词</li>
-<li>为了解决这个问题，JVM平台支持一种叫作即时编译的技术。即时编译的目的是避免函数被解释执行，而是将整个函数体编译成为机器码，每次函数执行时，只执行编译后的机器码即可，这种方式可以使执行效率大幅度提升。</li>
-<li>不过无论如何，基于解释器的执行模式仍然为中间语言的发展做出了不可磨灭的贡献。</li>
+</li>
+<li>方法区中常量引用的对象<ul>
+<li>比如：字符串常量池（String Table）里的引用</li>
 </ul>
-<h3 id="1-3-4-Java-代码的执行分类"><a href="#1-3-4-Java-代码的执行分类" class="headerlink" title="1.3.4 Java 代码的执行分类"></a>1.3.4 Java 代码的执行分类</h3><ul>
-<li>第一种是将源代码编译成字节码文件，然后在运行时通过解释器将字节码文件转为机器码执行</li>
-<li>第二种是编译执行（直接编译成机器码）。现代虚拟机为了提高执行效率，会使用即时编译技术（JIT,Just In Time）将方法编译成机器码后再执行</li>
-<li>HotSpot VM是目前市面上高性能虚拟机的代表作之一。它采用解释器与即时编译器并存的架构。在Java虚拟机运行时，解释器和即时编译器能够相互协作，各自取长补短，尽力去选择最合适的方式来权衡编译本地代码的时间和直接解释执行代码的时间。</li>
+</li>
+<li>所有被同步锁synchronized持有的对象</li>
+<li>Java虚拟机内部的引用。<ul>
+<li>基本数据类型对应的Class对象，一些常驻的异常对象（如：NullPointerException、OutOfMemoryError），系统类加载器。</li>
 </ul>
-<h3 id="那么问题来了，既然解释型语言效率不高，那么为什么还保留着解释器呢？"><a href="#那么问题来了，既然解释型语言效率不高，那么为什么还保留着解释器呢？" class="headerlink" title="那么问题来了，既然解释型语言效率不高，那么为什么还保留着解释器呢？"></a>那么问题来了，既然解释型语言效率不高，那么为什么还保留着解释器呢？</h3><p>首先明确：<br>当程序启动后，解释器可以马上发挥作用，省去编译的时间，立即执行。<br>编译器要想发挥作用，把代码编译成本地代码，需要一定的执行时间。但编译为本地代码后，执行效率高。<br>所以：<br>尽管JRockit VM中程序的执行性能会非常高效，但程序在启动时必然需要花费更长的时间来进行编译。对于服务端应用来说，启动时间并非是关注重点，但对于那些看中启动时间的应用场景而言，或许就需要采用解释器与即时编译器并存的架构来换取一个平衡点。在此模式下，当Java虚拟器启动时，解释器可以首先发挥作用，而不必等待即时编译器全部编译完成后再执行，这样可以省去许多不必要的编译时间。随着时间的推移，编译器发挥作用，把越来越多的代码编译成本地代码，获得更高的执行效率。</p>
-<p>同时，解释执行在编译器进行激进优化不成立的时候，作为编译器的“逃生门”</p>
+</li>
+<li>反映java虚拟机内部情况的JMXBean、JVMTI中注册的回调、本地代码缓存等</li>
+</ul>
+<p><strong><code>&lt;font color=&quot;red&quot;&gt;</code>注意：<code>&lt;/font&gt;</code></strong><br>如果要使用可达性分析算法来判断内存是否可回收，那么分析工作必须在一个能保障一致性的快照中进行。不满足这个条件的话分析结果的准确性就无法保证。<br>这也是导致 GC 必须进行 STW 的原因，即使是号称没有停顿的 CMS 收集器在枚举根节点时也会发生停顿。</p>
 <blockquote>
-<p>好啦，今天的文章就水到这里啦，还有详细的关于 Client Compiler 编译器和 Server Compiler编译器的内容就下次再讲啦！！！！！</p>
+<p>终于又让我水完了一篇文章，累鼠鼠鼠了，由于此篇文章篇幅已经很长，JVM 又很枯燥，所以就将回收算法中真正进行垃圾清除阶段的算法放在下一篇文章啦！！！！！！！</p>
 </blockquote>
 
                 
@@ -334,7 +354,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div></div>
-      <div>http://example.com/2024/11/13/how_the_exection_works/</div>
+      <div>http://example.com/2024/11/19/JVM_GC_mark_gr/</div>
     </div>
     <div class="license-meta">
       
@@ -346,7 +366,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年11月13日</div>
+          <div>2024年11月19日</div>
         </div>
       
       
@@ -378,17 +398,11 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/11/19/JVM_GC_mark_gr/" title="">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile"></span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/11/12/JVM_object_memory_allocate/" title="">
+                      <a href="/2024/11/13/how_the_exection_works/" title="">
                         <span class="hidden-mobile"></span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
