@@ -19,15 +19,15 @@
   <meta name="author" content="一岁半">
   <meta name="keywords" content="">
   
-    <meta name="description" content="JVM 之垃圾回收算法一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾垃圾的概念就是指程序运行过程中&lt;font color&#x3D;&quot;red&quot;&gt;没有任何指针指向的对象&lt;&#x2F;font&gt;，那么这样的对象就是需要被回收的垃圾 如果不能及时的对这些内存中的垃圾进行回收，那么这些垃圾就会一直占用空间到程序结束，被保留的空间无法被其他对象使用，从而可能导致内存溢出 二、">
+    <meta name="description" content="一、标记-清除算法执行过程：当堆内存中的有效内存空间（available memory）被耗尽的时候，整个程序就会停止（即 Stop The World），然后两项工作一起进行，第一项工作是标记，第二项工作是删除  标记：Collector 从引用的根节点开始遍历，&lt;font color&#x3D;&quot;red&quot;&gt;标记所有被引用的对象 &lt;&#x2F;font&gt;。一般实在对象的">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一岁半大魔王">
-<meta property="og:url" content="http://example.com/2024/11/19/JVM_GC_mark_gr/index.html">
+<meta property="og:url" content="http://example.com/2024/11/24/JVM_GC_clear/index.html">
 <meta property="og:site_name" content="一岁半大魔王">
-<meta property="og:description" content="JVM 之垃圾回收算法一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾垃圾的概念就是指程序运行过程中&lt;font color&#x3D;&quot;red&quot;&gt;没有任何指针指向的对象&lt;&#x2F;font&gt;，那么这样的对象就是需要被回收的垃圾 如果不能及时的对这些内存中的垃圾进行回收，那么这些垃圾就会一直占用空间到程序结束，被保留的空间无法被其他对象使用，从而可能导致内存溢出 二、">
+<meta property="og:description" content="一、标记-清除算法执行过程：当堆内存中的有效内存空间（available memory）被耗尽的时候，整个程序就会停止（即 Stop The World），然后两项工作一起进行，第一项工作是标记，第二项工作是删除  标记：Collector 从引用的根节点开始遍历，&lt;font color&#x3D;&quot;red&quot;&gt;标记所有被引用的对象 &lt;&#x2F;font&gt;。一般实在对象的">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-11-19T15:00:09.199Z">
-<meta property="article:modified_time" content="2024-11-19T15:03:52.414Z">
+<meta property="article:published_time" content="2024-11-24T14:14:40.032Z">
+<meta property="article:modified_time" content="2024-11-24T14:16:30.374Z">
 <meta property="article:author" content="一岁半">
 <meta name="twitter:card" content="summary_large_image">
   
@@ -210,8 +210,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-11-19 23:00" pubdate>
-          2024年11月19日 晚上
+        <time datetime="2024-11-24 22:14" pubdate>
+          2024年11月24日 晚上
         </time>
       </span>
     
@@ -222,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.5k 字
+          2.1k 字
         
       </span>
     
@@ -233,7 +233,7 @@
         
         
         
-          13 分钟
+          18 分钟
         
       </span>
     
@@ -275,66 +275,75 @@
             
               <div class="markdown-body">
                 
-                <h2 id="JVM-之垃圾回收算法"><a href="#JVM-之垃圾回收算法" class="headerlink" title="JVM 之垃圾回收算法"></a>JVM 之垃圾回收算法</h2><h3 id="一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾"><a href="#一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾" class="headerlink" title="一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾"></a>一、既然提到了垃圾回收那么我们首先要明确的是什么是垃圾</h3><p>垃圾的概念就是指程序运行过程中<code>&lt;font color=&quot;red&quot;&gt;</code>没有任何指针指向的对象<code>&lt;/font&gt;</code>，那么这样的对象就是需要被回收的垃圾</p>
-<p>如果不能及时的对这些内存中的垃圾进行回收，那么这些垃圾就会一直占用空间到程序结束，被保留的空间无法被其他对象使用，从而可能导致内存溢出</p>
-<h3 id="二、为什么需要GC？？？？"><a href="#二、为什么需要GC？？？？" class="headerlink" title="二、为什么需要GC？？？？"></a>二、为什么需要GC？？？？</h3><ul>
-<li>一个基本的认知就是高级程序设计语言如果不进行垃圾回收那么最后一定会造成内存溢出。那么为了避免这样的现象就一定需要有垃圾回收机制进行垃圾清理。</li>
-<li>而且，除了释放没用的对象外还可以整理 JVM 中碎片的内存区域，将不规整的小碎片区域进行整理，为后来可能出现的大对象预留空间</li>
-<li>随着业务越来越庞大，代码越来越复杂，用户越来越多，传统的 STW 的垃圾回收方式已经跟不上需求，必须对传统的垃圾回收方式进行改进</li>
-</ul>
-<h3 id="三、主要对那些内存区域进行-GC"><a href="#三、主要对那些内存区域进行-GC" class="headerlink" title="三、主要对那些内存区域进行 GC"></a>三、主要对那些内存区域进行 GC</h3><p>垃圾回收器可以对 JVM 管理的所有内存区域进行垃圾回收，其中 <code>&lt;font color=&quot;red&quot;&gt;</code>堆区域<code>&lt;/font&gt;</code>是垃圾回收的重点<br>从次数上讲 应该是<code>&lt;font color=&quot;red&quot;&gt;</code>频繁的收集 young 区，较少回收 old 区，基本不动 Perm 区<code>&lt;/font&gt;</code></p>
-<h3 id="四、这就到了这次的重头戏-——垃圾回收算法"><a href="#四、这就到了这次的重头戏-——垃圾回收算法" class="headerlink" title="四、&lt;font color=&quot;red&quot;&gt;这就到了这次的重头戏-——垃圾回收算法&lt;/font&gt;"></a>四、<code>&lt;font color=&quot;red&quot;&gt;</code>这就到了这次的重头戏-——垃圾回收算法<code>&lt;/font&gt;</code></h3><h4 id="4-1-判别阶段的算法"><a href="#4-1-判别阶段的算法" class="headerlink" title="4.1 判别阶段的算法"></a>4.1 判别阶段的算法</h4><h5 id="4-1-1-引用计数法"><a href="#4-1-1-引用计数法" class="headerlink" title="4.1.1 引用计数法"></a>4.1.1 引用计数法</h5><p><strong>什么是引用计数？</strong> 对于一个对象 A ，如果有其他的任何一个对象引用了 A ，则 A 的引用计数器加 1 ，当应用失效时，则该对象的引用计数器减 1 ，只要该对象的引用计数器为 0 则证明没有其他对象引用该对象，即当前对象引用失效，可以进行回收</p>
-<p><strong>优点？</strong>  实现简单，垃圾对象便于标识，判定效率高，回收没有延迟性<br><strong>缺点？</strong></p>
+                <h2 id="一、标记-清除算法"><a href="#一、标记-清除算法" class="headerlink" title="一、标记-清除算法"></a>一、标记-清除算法</h2><p><strong>执行过程</strong>：当堆内存中的有效内存空间（available memory）被耗尽的时候，整个程序就会停止（即 Stop The World），然后两项工作一起进行，第一项工作是标记，第二项工作是删除</p>
 <ul>
-<li><code>&lt;font color=&quot;red&quot;&gt;</code>存在循环引用问题<code>&lt;/font&gt;</code>，可能会出现两个孤岛彼此相连无法回收的问题（主要问题）</li>
-<li>它需要单独存储计数器，增加了空间开销</li>
-<li>每次赋值都需要进行计数器的更新，增加了时间开销</li>
+<li>标记：Collector 从引用的根节点开始遍历，<code>&lt;font color=&quot;red&quot;&gt;</code>标记所有被引用的对象 <code>&lt;/font&gt;</code>。一般实在对象的 Header 中记录为可达对象。</li>
+<li>清除：Collector 对堆内存从头到尾进行遍历，如果发现某个对象在其 Header 中没有被标记为可达对象，则将其回收</li>
 </ul>
-<p><strong>就想用这个算法怎么办？？？？</strong><br>那么就要解决主要矛盾——循环引用问题的解决：Python就使用了引用计数的方法进行垃圾回收，那么 Python 是怎么解决的呢？</p>
-<ul>
-<li>首先就是使用手动解除，这很好理解，就是在合适的时候，解除引用关系</li>
-<li>其次就是使用弱引用（weakref）</li>
-</ul>
+<p><strong>缺点</strong>：</p>
+<ol>
+<li>效率较低，对整个堆内存进行两次遍历</li>
+<li>在进行 GC 的过程中需要 STW 用户体验较差</li>
+<li>清楚之后内存空间不连续，产生内存碎片</li>
+</ol>
 <blockquote>
-<p>关于 Python 这作者只知道这些，余下的需要读者去进行补充</p>
+<p>什么是清楚，不是直接释放内存空间，而是把没有引用的对象地址放入空闲列表中，下次有新的对象需要进行加载的时判断垃圾的位置空间够不够，如果够就就存放</p>
 </blockquote>
-<h5 id="4-1-2-可达性分析算法"><a href="#4-1-2-可达性分析算法" class="headerlink" title="4.1.2 可达性分析算法"></a>4.1.2 可达性分析算法</h5><p>原理与基本实现思路：简单来说就是将对象之间的引用关系看成图，选定活动的对象作为 GC Roots ，然后跟踪引用链条，如果一个对象和 GC Roots 之间不可达，也就是不存在引用链条，那么即可认为是可回收对象。</p>
-<p><strong>基本思路：</strong></p>
+<h2 id="二、复制算法"><a href="#二、复制算法" class="headerlink" title="二、复制算法"></a>二、复制算法</h2><p><strong>算法的思想</strong>：将堆内存空间分为完全相等的两部分，每次只使用其中一块，在垃圾回收时将正在使用的内存中存活的对象复制到未使用的内存中，之后清楚正在使用的内存中的所有对象，交换两个内存空间的引用，最后完成垃圾回收。</p>
+<p><strong>优点</strong>：</p>
 <ul>
-<li>可达性分析算法是以根对象集合(GC Roots)为起始点，按照从上至下的方式搜索被根对象集合所连接的目标对象是否可达。</li>
-<li>使用可达性分析算法后，内存中的存活对象都会被根对象集合直接或间接连接着，搜索所走过的路径称为引用链(Reference Chain)</li>
-<li>如果目标对象没有任何引用链相连，则是不可达的，就意味着该对象己经死亡，可以标记为垃圾对象。</li>
-<li>在可达性分析算法中，只有能够被根对象集合直接或者间接连接的对象才是存活对象。</li>
+<li>没有标记和清除的过程，实现简单，运行高效</li>
+<li>复制过去的以后保证的空间的连续性，不会出现 “碎片” 问题<br><strong>缺点</strong>：</li>
+<li>内存利用率低</li>
+<li>对于 G1 这种拆分为多个 region 的 GC，复制而不是移动，意味着 GC 需要维护 region 之间的引用关系，不管内存占用或者时间开销都不小</li>
+<li>如果系统中的存活对象很多，复制效率会较低</li>
 </ul>
 <blockquote>
-<p>目前，这种垃圾标记算法比较常用</p>
+<p>这种算法的应用场景多在新生代，对象朝生夕死，复制效率较高，回收性价比很高</p>
 </blockquote>
-<p><strong>优点：实现简单，执行高效，有效解决循环引用的问题，可以防止内存泄漏</strong></p>
-<p><strong>什么样的对象可以被认为是 Gc Roots ？</strong></p>
+<h2 id="三、标记-压缩算法"><a href="#三、标记-压缩算法" class="headerlink" title="三、标记-压缩算法"></a>三、标记-压缩算法</h2><p><strong>已经有了上面两个算法了为什么还会出现这个算法呢？</strong><br>首先，标记-清楚算法效率不高且会影响用户体验，其次复制算法的高效性是建立在存活对象较少的情况，这种情况在新生代较多，但是老年代更常见的情况大部分都是存活对象，如果依然使用复制算法，复制成本会很高。因此，基于老年代中对象的特性，标记-压缩算法应运而生。</p>
+<p><strong>执行过程</strong>：<br>第一阶段和标记-清除算法一样，从根节点开始标记所有引用对象，第二阶段将所有的存活对象压缩到内存的一端，按顺序摆放，之后，清楚边界意外的所有内存</p>
+<p>标记-压缩算法执行后的效果就相当于标记-清除算法执行后再进行一次内存碎片的整理工作<br>二者之间的本质差别是标记-清除是一种非移动式的回收算法，而标记-复制算法则是移动式的。<br>经过标记-压缩算法，标记的存活对象将会被整理按照内存地址依次排列，而未被标记的内存会被清理掉，如此一来，当我们需要给新对象分配内存的时候，只需要 JVM 持有一个边界地址（使用指针碰撞的方式进行内存分配，如果对指针碰撞不了解就去看我之前的文章）就可以了，这比维护一个空闲链表少了许多开销</p>
+<p><strong>优点</strong>：</p>
 <ul>
-<li>虚拟机栈中引用的对象<ul>
-<li>比如：各个线程被调用的方法中使用到的参数、局部变量等。</li>
+<li>消除了标记-清除算法中，内存区域分散的缺点，我们需要重新分配内存时，JVM 只需要持有一个内存的起始地址即可。</li>
+<li>消除复制算法中，内存利用率不高的代价</li>
 </ul>
-</li>
-<li>本地方法栈内JNI(通常说的本地方法)引用的对象</li>
-<li>类静态属性引用的对象<ul>
-<li>比如：Java类的引用类型静态变量</li>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>从效率上来说不如复制算法，需要标记所有存活对象，还要整理所有存活对象的引用地址。对于老年代每次都有大量对象存活的区域来说，极为负重。</li>
+<li>并且移动对象的同时，如果这个对象还被其他对象引用，还需要调整引用的地址。</li>
+<li>移动过程中会出现 STW。</li>
 </ul>
-</li>
-<li>方法区中常量引用的对象<ul>
-<li>比如：字符串常量池（String Table）里的引用</li>
-</ul>
-</li>
-<li>所有被同步锁synchronized持有的对象</li>
-<li>Java虚拟机内部的引用。<ul>
-<li>基本数据类型对应的Class对象，一些常驻的异常对象（如：NullPointerException、OutOfMemoryError），系统类加载器。</li>
-</ul>
-</li>
-<li>反映java虚拟机内部情况的JMXBean、JVMTI中注册的回调、本地代码缓存等</li>
-</ul>
-<p><strong><code>&lt;font color=&quot;red&quot;&gt;</code>注意：<code>&lt;/font&gt;</code></strong><br>如果要使用可达性分析算法来判断内存是否可回收，那么分析工作必须在一个能保障一致性的快照中进行。不满足这个条件的话分析结果的准确性就无法保证。<br>这也是导致 GC 必须进行 STW 的原因，即使是号称没有停顿的 CMS 收集器在枚举根节点时也会发生停顿。</p>
 <blockquote>
-<p>终于又让我水完了一篇文章，累鼠鼠鼠了，由于此篇文章篇幅已经很长，JVM 又很枯燥，所以就将回收算法中真正进行垃圾清除阶段的算法放在下一篇文章啦！！！！！！！</p>
+<p>明确了以上三种回收算法的特点，并且基于读者已经明确了 JVM 堆内存是分区的这件事，我们就能知道 GC 分代进行的，事实也确实如此，目前几乎所有的 GC 都是采用分代收集算法执行垃圾回收的。</p>
+</blockquote>
+<h3 id="在-HotSpot-中，基于分代的概念，GC-所使用的内存回收算法必须结合年轻代和老年代各自的特点。"><a href="#在-HotSpot-中，基于分代的概念，GC-所使用的内存回收算法必须结合年轻代和老年代各自的特点。" class="headerlink" title="在 HotSpot 中，基于分代的概念，GC 所使用的内存回收算法必须结合年轻代和老年代各自的特点。"></a>在 HotSpot 中，基于分代的概念，GC 所使用的内存回收算法必须结合年轻代和老年代各自的特点。</h3><ul>
+<li>年轻代：<ul>
+<li>特点：区域相对较小，对象生命周期短、存活率低、回收频繁</li>
+<li>这种情况，复制算法的效率是最高的，复制算法的效率之和当前存活的对象有关，因此很适用于年轻代回收，而复制算法内存利用率不高，通过 HotSpot 中 survivor 的设计得到缓解。</li>
+</ul>
+</li>
+<li>老年代：<ul>
+<li>特点：区域较大、对象声明周期长、存活率高、回收不如年轻代频繁</li>
+<li>这中种存在大量对象存活的区域，复制算法显得不那么合适，一般是采用标记-清除和标记-整理的混合实现。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<ul>
+<li>Mark阶段的开销与存活对象的数量成正比</li>
+<li>Sweep阶段的开销与管理的区域大小成正比</li>
+<li>Compact 阶段的开销与存活的对象数量成正比</li>
+</ul>
+</blockquote>
+<h2 id="增量收集算法"><a href="#增量收集算法" class="headerlink" title="增量收集算法"></a>增量收集算法</h2><p>上述现有的算法，在垃圾回收过程中，应用软件将处于一种Stop the World 的状态。在Stop the World 状态下，应用程序所有的线程都会挂起，暂停一切正常的工作，等待垃圾回收的完成。如果垃圾回收时间过长，应用程序会被挂起很久，将严重影响用户体验或者系统的稳定性。为了解决这个问题，即对实时垃圾收集算法的研究直接导致了增量收集（Incremental Collecting）算法的诞生。</p>
+<p><strong>基本思想</strong>：<br>如果一次性将所有的垃圾进行处理，需要造成系统长时间的停顿，那么就可以让垃圾收集线程和应用程序线程交替执行。每次，垃圾收集线程只收集一小片区域的内存空间，接着切换到应用程序线程。依次反复，直到垃圾收集完成。</p>
+<p>总的来说，增量收集算法的基础仍是传统的标记-清除和复制算法。增量收集算法通过对线程间冲突的妥善处理，允许垃圾收集线程以分阶段的方式完成标记、清理或复制工作。</p>
+<p><strong>缺点</strong>：<br>使用这种方式，由于在垃圾回收过程中，间断性地还执行了应用程序代码，所以能减少系统的停顿时间。但是，因为线程切换和上下文转换的消耗，会使得垃圾回收的总体成本上升，造成系统吞吐量的下降。</p>
+<h2 id="分区算法：-—-G1-GC-使用的算法"><a href="#分区算法：-—-G1-GC-使用的算法" class="headerlink" title="分区算法： —- G1 GC 使用的算法"></a>分区算法： —- G1 GC 使用的算法</h2><p>分代算法将按照对象的生命周期长短划分成两个部分，分区算法将整个堆空间划分成连续的不同小区间。<br><code>&lt;font color=&quot;red&quot;&gt;</code>每一个小区间都独立使用，独立回收。这种算法的好处是可以控制一次回收多少个小区间。<code>&lt;/font&gt;</code><br>一般来说，在相同条件下，堆空间越大，一次 GC 时所需要的时间越长，有关 GC 产生的停顿也越长，为了控制 GC 的停顿时间，将一个整块的内存分为多个小区域，根据目标控制停顿时间，每次合理的回收若干个小区域，而不是整个堆空间，从而减少一次 GC 所需要的时间</p>
+<blockquote>
+<p>以上就是 GC 垃圾回收阶段的相关算法啦，不要以为JVM 的内存回收篇已经结束了哦，还有垃圾回收器、日志等相关概念没介绍，让我们一起加油啃下这块内容</p>
 </blockquote>
 
                 
@@ -354,7 +363,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div></div>
-      <div>http://example.com/2024/11/19/JVM_GC_mark_gr/</div>
+      <div>http://example.com/2024/11/24/JVM_GC_clear/</div>
     </div>
     <div class="license-meta">
       
@@ -366,7 +375,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年11月19日</div>
+          <div>2024年11月24日</div>
         </div>
       
       
@@ -398,17 +407,11 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/11/24/JVM_GC_clear/" title="">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile"></span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/11/13/how_the_exection_works/" title="">
+                      <a href="/2024/11/19/JVM_GC_mark_gr/" title="">
                         <span class="hidden-mobile"></span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
