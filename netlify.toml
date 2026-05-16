@@ -1,0 +1,12 @@
+[build]
+  command = "hexo generate"
+  publish = "public"
+
+[build.environment]
+  Node_Version = "20"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
