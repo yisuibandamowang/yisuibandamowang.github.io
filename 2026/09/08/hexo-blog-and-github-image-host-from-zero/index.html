@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="个人技术博客">
+    <meta name="author" content="Keep Team">
+    
+    <title>
+        
+            从零搭建 Hexo 博客、GitHub Pages 与 PicGo 图床：完整复盘 |
+        
+        Keep Theme
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+        <link rel="shortcut icon" href="/images/logo.svg">
+    
+    
+<link rel="stylesheet" href="/font/css/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/font/css/regular.min.css">
+
+    
+<link rel="stylesheet" href="/font/css/solid.min.css">
+
+    
+<link rel="stylesheet" href="/font/css/brands.min.css">
+
+    
+    <script class="keep-theme-configurations">
+    const KEEP = window.KEEP || {}
+    KEEP.hexo_config = {"hostname":"yisuibandamowang.github.io","root":"/","language":"zh-CN"}
+    KEEP.theme_config = {"base_info":{"primary_color":"#0066cc","title":"Keep Theme","author":"Keep Team","avatar":"/images/avatar.svg","logo":"/images/logo.svg","favicon":"/images/logo.svg"},"menu":{"home":"/","archives":"/archives"},"first_screen":{"enable":false,"background_img":"/images/bg.svg","background_img_dark":"/images/bg.svg","description":"Keep writing and Keep loving.","hitokoto":false},"social_contact":{"enable":false,"links":{"github":null,"weixin":null,"qq":null,"weibo":null,"zhihu":null,"twitter":null,"x":null,"facebook":null,"email":null}},"scroll":{"progress_bar":false,"percent":false,"hide_header":true},"home":{"announcement":null,"category":false,"tag":false,"post_datetime":"updated"},"post":{"author_badge":{"enable":true,"level_badge":true,"custom_badge":["One","Two","Three"]},"word_count":{"wordcount":false,"min2read":false},"datetime_format":"YYYY-MM-DD HH:mm:ss","copyright_info":false,"share":false,"reward":{"enable":false,"img_link":null,"text":null,"icon":null}},"code_block":{"tools":{"enable":false,"style":"default"},"highlight_theme":"default"},"toc":{"enable":false,"number":false,"expand_all":false,"init_open":true,"layout":"right"},"website_count":{"busuanzi_count":{"enable":false,"site_uv":false,"site_pv":false,"page_pv":false}},"local_search":{"enable":false,"preload":false},"comment":{"enable":false,"use":"valine","valine":{"appid":null,"appkey":null,"server_urls":null,"placeholder":null},"gitalk":{"github_id":null,"github_admins":null,"repository":null,"client_id":null,"client_secret":null,"proxy":null},"twikoo":{"env_id":null,"region":null,"version":"1.6.39"},"waline":{"server_url":null,"reaction":false,"version":"3.3.2"},"giscus":{"repo":null,"repo_id":null,"category":"Announcements","category_id":null,"reactions_enabled":false},"artalk":{"server":null},"disqus":{"shortname":null}},"rss":{"enable":false},"lazyload":{"enable":false},"cdn":{"enable":false,"provider":"cdnjs"},"pjax":{"enable":false},"footer":{"since":2020,"word_count":false,"site_deploy":{"enable":false,"provider":"github","url":null},"record":{"enable":false,"list":[{"code":null,"link":null}]}},"inject":{"enable":false,"css":[null],"js":[null]},"root":"","source_data":{"profile":{"author":"yisuibandamowang","avatar":"/images/avatar.svg","role":"Frontend Engineer / Blogger","tagline":"Keep building, keep shipping.","intro":"I write about Hexo, frontend patterns, and practical build workflows.","subtitle":"A little more about me.","socials":[{"key":"github","url":"https://github.com/yisuibandamowang"},{"key":"email","url":"yisuibandamowang@example.com"},{"key":"x","url":"https://x.com/"}],"stats":[{"value":"10+","label":"Projects"},{"value":"30+","label":"Posts"},{"value":"5+","label":"Years"}],"highlights":["Focused on practical engineering","Enjoys clean interfaces and simple systems","Keeps notes and ships small iterations"],"skills":[{"name":"Hexo","level":"Advanced","value":90,"desc":"Theme customization and content workflows"},{"name":"Frontend","level":"Strong","value":85,"desc":"Layout, interaction, and responsive UI"},{"name":"Content","level":"Daily","value":95,"desc":"Writing, editing, and documentation"}],"experience":[{"year":2024,"title":"Blogging system refresh","desc":"Reworked the site structure and content presentation"},{"year":2025,"title":"Personal knowledge workflow","desc":"Built a repeatable note-to-post publishing flow"}],"links":[{"name":"GitHub","url":"https://github.com/","description":"Source and side projects"},{"name":"Email","url":"mailto:you@example.com","description":"Direct contact"}],"bio":"This is a short bio.\n"}},"version":"4.2.5"}
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"}
+    KEEP.language_code_block = {"copy":"复制代码","copied":"已复制","fold":"折叠代码块","folded":"已折叠"}
+    KEEP.language_copy_copyright = {"copy":"复制版权信息","copied":"已复制","title":"原文标题","author":"原文作者","link":"原文链接"}
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+
+<main class="page-container border-box">
+    <!-- home first screen  -->
+    
+
+    <!-- page content -->
+    <div class="page-main-content border-box">
+        <div class="page-main-content-top">
+            
+<header class="header-wrapper">
+
+    <div class="border-box header-content">
+        <div class="left flex-start border-box">
+            
+                <a class="logo-image border-box" href="/">
+                    <img src="/images/logo.svg">
+                </a>
+            
+            <a class="site-name border-box" href="/">
+               Keep Theme
+            </a>
+        </div>
+
+        <div class="right border-box">
+            <div class="pc border-box">
+                <ul class="menu-list border-box">
+                    
+                        
+                        <li class="menu-item flex-start border-box">
+                            <a class="menu-text-color border-box" href="/">
+                                
+                                首页
+                                
+                            </a>
+                            
+                        </li>
+                    
+                        
+                        <li class="menu-item flex-start border-box">
+                            <a class="menu-text-color border-box" href="/archives">
+                                
+                                归档
+                                
+                            </a>
+                            
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile border-box flex-start">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list border-box">
+            
+                
+                <li class="drawer-menu-item border-box not-sub-menu">
+                    <label class="drawer-menu-label border-box">
+                        <a class="drawer-menu-text-color left-side flex-start border-box" href="/">
+                            
+                            首页
+                        </a>
+                        
+                    </label>
+                    
+                </li>
+            
+                
+                <li class="drawer-menu-item border-box not-sub-menu">
+                    <label class="drawer-menu-label border-box">
+                        <a class="drawer-menu-text-color left-side flex-start border-box" href="/archives">
+                            
+                            归档
+                        </a>
+                        
+                    </label>
+                    
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle border-box">
+
+            <div class="main-content border-box">
+                
+
+                    
+<div class="fade-in-down-animation">
+    <div class="post-page-container border-box">
+        <div class="post-content-container border-box">
+            
+
+            <div class="post-content-bottom border-box">
+                
+                    <div class="post-title">
+                        从零搭建 Hexo 博客、GitHub Pages 与 PicGo 图床：完整复盘
+                    </div>
+                
+
+                
+                    <div class="post-header border-box">
+                        
+                            <div class="avatar-box border-box">
+                                <img src="/images/avatar.svg">
+                            </div>
+                        
+                        <div class="info-box">
+                            <div class="author border-box">
+                                <span class="name">Keep Team</span>
+                                
+                                    <span class="author-badge">Lv1</span>
+                                
+                            </div>
+                            <div class="meta-info border-box">
+                                
+
+<div class="post-meta-info-container border-box post">
+    <div class="post-meta-info border-box">
+        
+
+        
+            <span class="meta-info-item post-create-date">
+                <i class="icon fa-solid fa-calendar-plus"></i>&nbsp;
+                <span class="datetime">2026-09-08 21:00:00</span>
+            </span>
+
+            
+                <span class="meta-info-item post-update-date">
+                    <i class="icon fa-solid fa-file-pen"></i>&nbsp;
+                    <span class="datetime" data-updated="Tue Sep 08 2026 21:00:00 GMT+0800">2026-09-08 21:00:00</span>
+                </span>
+            
+        
+
+        
+            <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+                <ul class="post-category-ul">
+                    
+                            <li class="category-item"><a href="/categories/%E5%BB%BA%E7%AB%99%E8%AE%B0%E5%BD%95/">建站记录</a></li>
+                        
+                    
+                </ul>
+            </span>
+        
+
+        
+            <span class="post-tag meta-info-item border-box">
+                <ul class="post-tag-ul">
+                    
+                            <li class="tag-item"><span class="tag-separator"><i class="icon fas fa-hashtag"></i></span><a href="/tags/Hexo/">Hexo</a></li>
+                        
+                    
+                            <li class="tag-item"><span class="tag-separator"><i class="icon fas fa-hashtag"></i></span><a href="/tags/GitHub-Pages/">GitHub Pages</a></li>
+                        
+                    
+                            <li class="tag-item"><span class="tag-separator"><i class="icon fas fa-hashtag"></i></span><a href="/tags/PicGo/">PicGo</a></li>
+                        
+                    
+                            <li class="tag-item"><span class="tag-separator"><i class="icon fas fa-hashtag"></i></span><a href="/tags/GitHub-%E5%9B%BE%E5%BA%8A/">GitHub 图床</a></li>
+                        
+                    
+                </ul>
+            </span>
+        
+
+        
+        
+        
+        
+    </div>
+
+    
+</div>
+
+                            </div>
+                        </div>
+                    </div>
+                
+
+                <div class="post-content keep-markdown-body ">
+                    
+
+                    
+                         <p>这篇文章记录一次完整、可复现的博客搭建过程：在本地初始化 Hexo，安装 Keep 主题，配置 GitHub Pages，改造首页和 About 页面，再把 PicGo 接到独立的 GitHub 图床仓库，最后用真实图片验证上传和公网访问。</p>
+<p>文章中的命令和输出来自实际操作记录。为了安全，GitHub Token、SSH 私钥、个人隐私图片和任何完整凭据都不会写入文章。</p>
+<h2 id="最终架构"><a href="#最终架构" class="headerlink" title="最终架构"></a>最终架构</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">本地 Mac</span><br><span class="line">  |-- Hexo 源码仓库 /Users/App/blog</span><br><span class="line">  |     |-- source/_posts/       文章</span><br><span class="line">  |     |-- source/about/        About 页面</span><br><span class="line">  |     |-- source/_data/        个人资料</span><br><span class="line">  |     |-- themes/keep/         Keep 主题 submodule</span><br><span class="line">  |     `-- _config.yml          站点和部署配置</span><br><span class="line">  |</span><br><span class="line">  |-- PicGo Desktop              图片上传</span><br><span class="line">  |</span><br><span class="line">  |-- GitHub Pages</span><br><span class="line">  |     `-- yisuibandamowang/yisuibandamowang.github.io</span><br><span class="line">  |</span><br><span class="line">  `-- GitHub 图床</span><br><span class="line">        `-- yisuibandamowang/myblog_resources/img/</span><br></pre></td></tr></table></figure>
+
+<p>最终访问地址：</p>
+<ul>
+<li>博客首页：<a href="https://yisuibandamowang.github.io/">https://yisuibandamowang.github.io/</a></li>
+<li>个人主页：<a href="https://yisuibandamowang.github.io/about/">https://yisuibandamowang.github.io/about/</a></li>
+<li>图床仓库：<a class="link"   target="_blank" rel="noopener" href="https://github.com/yisuibandamowang/myblog_resources" >https://github.com/yisuibandamowang/myblog_resources<i class="fas fa-external-link-alt"></i></a></li>
+</ul>
+<p>博客仓库负责文章和页面，图床仓库只负责图片。PicGo 把图片上传到图床仓库，文章使用 jsDelivr 或 GitHub Raw 的绝对地址。</p>
+<h2 id="一、初始化和检查-Hexo-项目"><a href="#一、初始化和检查-Hexo-项目" class="headerlink" title="一、初始化和检查 Hexo 项目"></a>一、初始化和检查 Hexo 项目</h2><p>项目目录是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /Users/App/blog</span><br><span class="line"><span class="built_in">ls</span> -la</span><br><span class="line">sed -n <span class="string">&#x27;1,220p&#x27;</span> package.json</span><br></pre></td></tr></table></figure>
+
+<p>这是一个 Hexo 项目，<code>package.json</code> 中的关键脚本是：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;build&quot;</span><span class="punctuation">:</span> <span class="string">&quot;hexo generate&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;clean&quot;</span><span class="punctuation">:</span> <span class="string">&quot;hexo clean&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;deploy&quot;</span><span class="punctuation">:</span> <span class="string">&quot;hexo deploy&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;server&quot;</span><span class="punctuation">:</span> <span class="string">&quot;hexo server&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>先生成静态文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>成功输出的核心内容：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">INFO  Validating config</span><br><span class="line">INFO  Start processing</span><br><span class="line">INFO  Generated: index.html</span><br><span class="line">INFO  Generated: 2026/05/16/hello-world/index.html</span><br><span class="line">INFO  63 files generated in 261 ms</span><br></pre></td></tr></table></figure>
+
+<p>本地启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo server</span><br></pre></td></tr></table></figure>
+
+<p>成功时输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INFO  Hexo is running at http://localhost:4000/ . Press Ctrl+C to stop.</span><br></pre></td></tr></table></figure>
+
+<p>期间遇到过一个与 Hexo 无关的测试工具问题：自动化工具报错 <code>Could not find Chrome (ver. 131.0.6778.204)</code>。这只是工具缓存的浏览器版本缺失，不能据此判断博客构建失败；后来通过本机浏览器和 <code>curl</code> 检查页面。</p>
+<h2 id="二、安装-Keep-主题和网络问题"><a href="#二、安装-Keep-主题和网络问题" class="headerlink" title="二、安装 Keep 主题和网络问题"></a>二、安装 Keep 主题和网络问题</h2><p>第一次直接从 GitHub 克隆主题：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/XPoet/hexo-theme-keep themes/keep</span><br></pre></td></tr></table></figure>
+
+<p>当时失败：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fatal: unable to access &#x27;https://github.com/XPoet/hexo-theme-keep/&#x27;:</span><br><span class="line">Failed to connect to github.com port 443</span><br></pre></td></tr></table></figure>
+
+<p>随后尝试下载 npm 压缩包：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -L <span class="string">&quot;https://registry.npmjs.org/hexo-theme-keep/-/hexo-theme-keep-4.3.1.tgz&quot;</span> -o keep-theme.tgz</span><br><span class="line">tar -xzf keep-theme.tgz</span><br></pre></td></tr></table></figure>
+
+<p>下载结果不是压缩包，所以 <code>tar</code> 报：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar: Error opening archive: Unrecognized archive format</span><br></pre></td></tr></table></figure>
+
+<p>解决方法是配置本机代理：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global http.proxy http://127.0.0.1:7890</span><br><span class="line">git config --global https.proxy http://127.0.0.1:7890</span><br></pre></td></tr></table></figure>
+
+<p>再次克隆成功。后来把主题整理为 Git submodule：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git submodule add https://github.com/XPoet/hexo-theme-keep themes/keep</span><br></pre></td></tr></table></figure>
+
+<p>如果把主题直接当普通目录加入外层仓库，Git 会提示：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">warning: adding embedded git repository: themes/keep</span><br></pre></td></tr></table></figure>
+
+<p>正确做法是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">rm</span> --cached themes/keep</span><br><span class="line">git submodule add https://github.com/XPoet/hexo-theme-keep themes/keep</span><br></pre></td></tr></table></figure>
+
+<p>这样外层仓库只记录主题提交指针，不会把主题仓库错误嵌套进去。</p>
+<h2 id="三、配置-Hexo-和-GitHub-Pages"><a href="#三、配置-Hexo-和-GitHub-Pages" class="headerlink" title="三、配置 Hexo 和 GitHub Pages"></a>三、配置 Hexo 和 GitHub Pages</h2><p>核心 <code>_config.yml</code> 配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">title:</span> <span class="string">My</span> <span class="string">Blog</span></span><br><span class="line"><span class="attr">subtitle:</span> <span class="string">&#x27;记录生活，分享技术&#x27;</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">&#x27;个人技术博客&#x27;</span></span><br><span class="line"><span class="attr">author:</span> <span class="string">yisuibandamowang</span></span><br><span class="line"><span class="attr">language:</span> <span class="string">zh-CN</span></span><br><span class="line"><span class="attr">timezone:</span> <span class="string">&#x27;Asia/Shanghai&#x27;</span></span><br><span class="line"><span class="attr">url:</span> <span class="string">https://yisuibandamowang.github.io</span></span><br><span class="line"><span class="attr">permalink:</span> <span class="string">:year/:month/:day/:title/</span></span><br><span class="line"><span class="attr">theme:</span> <span class="string">keep</span></span><br><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">  <span class="attr">repository:</span> <span class="string">https://github.com/yisuibandamowang/yisuibandamowang.github.io.git</span></span><br><span class="line">  <span class="attr">branch:</span> <span class="string">main</span></span><br></pre></td></tr></table></figure>
+
+<p><code>url</code> 会影响永久链接和资源根路径。部署仓库使用 GitHub Pages 约定的 <code>yisuibandamowang/yisuibandamowang.github.io</code>。</p>
+<h2 id="四、初始化-Git-并处理远程内容"><a href="#四、初始化-Git-并处理远程内容" class="headerlink" title="四、初始化 Git 并处理远程内容"></a>四、初始化 Git 并处理远程内容</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br><span class="line">git branch -M main</span><br><span class="line">git config --global user.name <span class="string">&quot;yisuibandamowang&quot;</span></span><br><span class="line">git config --global user.email <span class="string">&quot;2307585872@qq.com&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>检查 GitHub SSH：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com 2&gt;&amp;1 || <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>实际结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hi yisuibandamowang! You&#x27;ve successfully authenticated,</span><br><span class="line">but GitHub does not provide shell access.</span><br></pre></td></tr></table></figure>
+
+<p>这表示认证成功；GitHub 不提供 Shell 是正常提示。</p>
+<p>第一次推送：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin https://github.com/yisuibandamowang/yisuibandamowang.github.io.git</span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
+
+<p>遇到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">! [rejected] main -&gt; main (fetch first)</span><br><span class="line">error: failed to push some refs</span><br></pre></td></tr></table></figure>
+
+<p>原因是远程仓库已经有本地没有的提交。不要直接强推，先检查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gh repo view yisuibandamowang/yisuibandamowang.github.io</span><br><span class="line">git fetch origin</span><br><span class="line">git <span class="built_in">log</span> --oneline --all --decorate -10</span><br></pre></td></tr></table></figure>
+
+<p>确认远程内容后再整合和推送。实际项目最终复用了已有仓库，并使用 <code>npx hexo deploy</code> 发布生成后的静态站点。</p>
+<h2 id="五、首页和-About-页面改造"><a href="#五、首页和-About-页面改造" class="headerlink" title="五、首页和 About 页面改造"></a>五、首页和 About 页面改造</h2><p>默认 Hexo 首页是文章流，About 页面也容易被渲染成普通文章。最终做了两层调整。</p>
+<p>首页访问根地址时仍然先显示文章列表，个人内容作为首屏增强，不覆盖文章流。首页加入头像、作者名、身份、简介、社交入口、Stats 卡片和 Highlights 卡片，下方继续保留文章和分页。</p>
+<p>点击 About 后进入独立个人主页，包含头像、简介、社交入口、技能卡片、经历时间线、常用链接和统计卡片。</p>
+<p>资料集中在：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source/_data/profile.yml</span><br></pre></td></tr></table></figure>
+
+<p>页面入口在：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source/about/index.md</span><br></pre></td></tr></table></figure>
+
+<h2 id="六、PicGo-GitHub-图床配置"><a href="#六、PicGo-GitHub-图床配置" class="headerlink" title="六、PicGo GitHub 图床配置"></a>六、PicGo GitHub 图床配置</h2><p>使用已有公开仓库：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yisuibandamowang/myblog_resources</span><br></pre></td></tr></table></figure>
+
+<p>PicGo Desktop 的实际配置：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Repository: yisuibandamowang/myblog_resources</span><br><span class="line">Branch: main</span><br><span class="line">Path: img/</span><br><span class="line">Custom URL: https://cdn.jsdelivr.net/gh/yisuibandamowang/myblog_resources@main</span><br><span class="line">Output: Markdown</span><br></pre></td></tr></table></figure>
+
+<p>GitHub Token 使用 Fine-grained token：</p>
+<ul>
+<li>Repository access：只选择 <code>myblog_resources</code></li>
+<li>Repository permission：<code>Contents: Read and write</code></li>
+<li>其他权限：<code>No access</code></li>
+</ul>
+<p>Token 只保存在 PicGo 本机配置，不放进 <code>_config.yml</code>、Markdown、截图、Shell 历史或 Git 提交。</p>
+<h2 id="七、图床测试遇到的-409-坑"><a href="#七、图床测试遇到的-409-坑" class="headerlink" title="七、图床测试遇到的 409 坑"></a>七、图床测试遇到的 409 坑</h2><p>第一次上传测试使用了 <code>images/</code>，GitHub API 返回：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">statusCode: 409</span><br><span class="line">Sorry, a file exists where you&#x27;re trying to create a subdirectory.</span><br><span class="line">Choose a new path and try again.</span><br></pre></td></tr></table></figure>
+
+<p>检查仓库目录后发现：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">img      Directory</span><br><span class="line">images   File</span><br></pre></td></tr></table></figure>
+
+<p>仓库里已经有一个名为 <code>images</code> 的文件，所以不能把 <code>images/</code> 当成目录。这个问题不是 Token 错误，而是 GitHub Contents API 的路径冲突保护。</p>
+<p>解决办法是把 PicGo Path 改为仓库中已经存在的目录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">img/</span><br></pre></td></tr></table></figure>
+
+<p>再次使用真实图片 <code>/Users/mima0000/Pictures/IMG_2971.JPG</code> 上传，PicGo 日志返回：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[PicGo INFO] Uploading... Current uploader is [github]</span><br><span class="line">[PicGo SUCCESS]</span><br><span class="line">https://cdn.jsdelivr.net/gh/yisuibandamowang/myblog_resources@main/img/IMG_2971.JPG</span><br></pre></td></tr></table></figure>
+
+<h2 id="八、验证-GitHub、CDN-和-Raw-链路"><a href="#八、验证-GitHub、CDN-和-Raw-链路" class="headerlink" title="八、验证 GitHub、CDN 和 Raw 链路"></a>八、验证 GitHub、CDN 和 Raw 链路</h2><p>CDN 地址：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://cdn.jsdelivr.net/gh/yisuibandamowang/myblog_resources@main/img/IMG_2971.JPG</span><br></pre></td></tr></table></figure>
+
+<p>Raw 备用地址：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://raw.githubusercontent.com/yisuibandamowang/myblog_resources/main/img/IMG_2971.JPG</span><br></pre></td></tr></table></figure>
+
+<p>用 <code>curl</code> 验证 CDN：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -L --max-time 60 -o /tmp/picgo-cdn-test.jpg +  -w <span class="string">&#x27;cdn status=%&#123;http_code&#125; type=%&#123;content_type&#125; bytes=%&#123;size_download&#125;\n&#x27;</span> +  <span class="string">&#x27;https://cdn.jsdelivr.net/gh/yisuibandamowang/myblog_resources@main/img/IMG_2971.JPG&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>实际结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cdn status=200 type=image/jpeg bytes=1634308</span><br><span class="line">raw status=200 type=image/jpeg bytes=1634308</span><br></pre></td></tr></table></figure>
+
+<p>两个地址都返回 <code>200</code> 和 <code>image/jpeg</code>，说明 PicGo、GitHub 文件读取和 CDN 分发已经打通。若 jsDelivr 刚上传后暂时 404，可以先使用 Raw 地址等待缓存刷新。</p>
+<h2 id="九、本地构建和发布"><a href="#九、本地构建和发布" class="headerlink" title="九、本地构建和发布"></a>九、本地构建和发布</h2><p>每次发布前执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run clean &amp;&amp; npm run build</span><br></pre></td></tr></table></figure>
+
+<p>最终成功输出包含：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">INFO  Generated: about/index.html</span><br><span class="line">INFO  Generated: index.html</span><br><span class="line">INFO  Generated: 2026/05/16/hello-world/index.html</span><br><span class="line">INFO  64 files generated in 286 ms</span><br></pre></td></tr></table></figure>
+
+<p>确认新文章生成：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">test</span> -f public/2026/09/08/hexo-blog-and-github-image-host-from-zero/index.html</span><br><span class="line">rg -n <span class="string">&#x27;从零搭建|PicGo|myblog_resources&#x27;</span> +  public/2026/09/08/hexo-blog-and-github-image-host-from-zero/index.html</span><br></pre></td></tr></table></figure>
+
+<p>发布到 GitHub Pages：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>如果 Git 全局代理影响部署，可以只对本次命令临时清空代理：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GIT_CONFIG_COUNT=2 +GIT_CONFIG_KEY_0=http.proxy GIT_CONFIG_VALUE_0= +GIT_CONFIG_KEY_1=https.proxy GIT_CONFIG_VALUE_1= +npx hexo deploy</span><br></pre></td></tr></table></figure>
+
+<h2 id="十、日常写作流程"><a href="#十、日常写作流程" class="headerlink" title="十、日常写作流程"></a>十、日常写作流程</h2><p>创建新文章：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /Users/App/blog</span><br><span class="line">npx hexo new post <span class="string">&quot;文章标题&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>插图流程：</p>
+<ol>
+<li>截图或复制图片。</li>
+<li>使用 PicGo 剪贴板上传快捷键，或在 PicGo 中选择图片。</li>
+<li>确认当前图床为 <code>GitHub / 博客</code>。</li>
+<li>确认路径为 <code>img/</code>。</li>
+<li>上传成功后复制 Markdown。</li>
+<li>粘贴到 Hexo 文章。</li>
+</ol>
+<p>示例：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![<span class="string">图片说明</span>](<span class="link">https://cdn.jsdelivr.net/gh/yisuibandamowang/myblog_resources@main/img/example.png</span>)</span><br></pre></td></tr></table></figure>
+
+<p>本地预览和发布：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm run clean</span><br><span class="line">npm run build</span><br><span class="line">npm run server</span><br></pre></td></tr></table></figure>
+
+<p>访问 <code>http://localhost:4000/</code>，确认无误后执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run clean &amp;&amp; npm run build &amp;&amp; npx hexo deploy</span><br></pre></td></tr></table></figure>
+
+<h2 id="十一、常见错误速查"><a href="#十一、常见错误速查" class="headerlink" title="十一、常见错误速查"></a>十一、常见错误速查</h2><ul>
+<li><code>fetch first</code>：远程仓库有本地没有的提交。先 <code>git fetch</code>、检查日志，再决定合并方式，不要未经确认强推。</li>
+<li><code>embedded git repository</code>：主题被错误地当作普通目录加入，应使用 Git submodule。</li>
+<li>PicGo <code>409 Conflict</code>：目标路径与已有文件或目录冲突。本项目最终使用 <code>img/</code>，而不是冲突的 <code>images/</code>。</li>
+<li>PicGo <code>401 Bad credentials</code>：检查 Token 是否过期、是否有多余空格、是否授权正确仓库，以及 <code>Contents</code> 是否为 <code>Read and write</code>。</li>
+<li>jsDelivr 暂时打不开：先使用同一路径的 Raw 地址，等待 CDN 刷新。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这次流程最终形成了清晰分工：Hexo 生成静态博客，Keep 负责主题，GitHub Pages 负责发布，PicGo 负责上传图片，GitHub 仓库存储图片，jsDelivr 提供 CDN 地址。</p>
+<p>真正影响成功率的细节是：确认网络和代理、主题使用 submodule、不要覆盖已有远程仓库、确认图床路径实际是目录、Token 只保存在本机，以及每次发布前执行完整构建。</p>
+
+                    
+                </div>
+
+                
+
+                <div class="post-bottom-tags-and-share border-box">
+                    <div>
+                        
+                            <ul class="post-tags-box border-box">
+                                
+                                    <li class="tag-item border-box">
+                                        <i class="icon fas fa-hashtag"></i>&nbsp;<a href="/tags/Hexo/">Hexo</a>
+                                    </li>
+                                
+                                    <li class="tag-item border-box">
+                                        <i class="icon fas fa-hashtag"></i>&nbsp;<a href="/tags/GitHub-Pages/">GitHub Pages</a>
+                                    </li>
+                                
+                                    <li class="tag-item border-box">
+                                        <i class="icon fas fa-hashtag"></i>&nbsp;<a href="/tags/PicGo/">PicGo</a>
+                                    </li>
+                                
+                                    <li class="tag-item border-box">
+                                        <i class="icon fas fa-hashtag"></i>&nbsp;<a href="/tags/GitHub-%E5%9B%BE%E5%BA%8A/">GitHub 图床</a>
+                                    </li>
+                                
+                            </ul>
+                        
+                    </div>
+                    <div>
+                        
+                    </div>
+                </div>
+
+                
+
+                
+                    <div class="post-nav border-box">
+                        
+                        
+                            <div class="next-post">
+                                <a class="next"
+                                   rel="next"
+                                   href="/2026/05/16/hello-world/"
+                                   title="Hello World"
+                                >
+                                    <span class="title flex-center">
+                                        <span class="post-nav-title-item text-ellipsis">Hello World</span>
+                                        <span class="post-nav-item">下一篇</span>
+                                    </span>
+                                    <span class="right arrow-icon flex-center">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                </a>
+                            </div>
+                        
+                    </div>
+                
+
+                
+                    
+
+
+
+
+
+
+                
+            </div>
+        </div>
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+        </div>
+
+        <div class="page-main-content-bottom border-box">
+            
+<footer class="footer border-box">
+    <div class="copyright-info info-item">
+    &copy;&nbsp;<span>2020</span>&nbsp;-&nbsp;2026
+    
+            &nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;&nbsp;<a href="/">Keep Team</a>
+        
+    </div>
+
+    <div class="theme-info info-item">
+        由&nbsp;<a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;驱动&nbsp;&&nbsp;主题&nbsp;<a class="keep-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep</a>
+    </div>
+
+    
+
+    
+
+    
+</footer>
+
+        </div>
+    </div>
+
+    <!-- post tools -->
+    
+        <div class="post-tools right-toc">
+            <div class="post-tools-container border-box">
+    <ul class="post-tools-list border-box">
+        <!-- PC encrypt again -->
+        
+
+        <!-- PC TOC show toggle -->
+        
+
+        <!-- PC go comment -->
+        
+
+        <!-- PC full screen -->
+        <li class="tools-item flex-center full-screen">
+            <i class="fa-solid fa-expand"></i>
+        </li>
+    </ul>
+</div>
+
+        </div>
+    
+
+    <!-- side tools -->
+    <div class="side-tools">
+        <div class="side-tools-container border-box ">
+    <ul class="side-tools-list side-tools-show-handle border-box">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <!-- toggle mode -->
+        
+            <li class="tools-item tool-toggle-theme-mode flex-center">
+                <i class="fas fa-moon"></i>
+            </li>
+        
+
+        <!-- rss -->
+        
+
+        <!-- to bottom -->
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list border-box">
+        
+
+        
+
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+
+        <li class="tools-item tool-scroll-to-top flex-center show-arrow">
+            <i class="arrow fas fa-arrow-up"></i>
+            <span class="percent"></span>
+        </li>
+    </ul>
+</div>
+
+    </div>
+
+    <!-- image mask -->
+    <div class="zoom-in-image-mask">
+    <img class="zoom-in-image">
+</div>
+
+
+    <!-- local search -->
+    
+
+    <!-- tablet toc -->
+    
+</main>
+
+
+
+<!-- common js -->
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/toggle-theme.js"></script>
+
+<script src="/js/code-block.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/libs/anime.min.js"></script>
+
+
+<!-- local search -->
+
+
+<!-- lazyload -->
+
+
+<div class="">
+    <!-- home page -->
+    
+
+    <!-- post page -->
+    
+        <!-- post-helper -->
+        
+<script src="/js/post/post-helper.js"></script>
+
+
+        <!-- toc -->
+        
+
+        <!-- copyright-info -->
+        
+
+        <!-- share -->
+        
+    
+
+    <!-- categories page -->
+    
+
+    <!-- links page -->
+    
+
+    <!-- photos page -->
+    
+
+    <!-- tools page -->
+    
+</div>
+
+<!-- mermaid -->
+
+
+<!-- pjax -->
+
+
+
+</body>
+</html>
